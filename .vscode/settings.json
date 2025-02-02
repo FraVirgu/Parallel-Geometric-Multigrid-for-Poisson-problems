@@ -68,6 +68,8 @@
     "complex": "cpp",
     "list": "cpp",
     "map": "cpp",
-    "set": "cpp"
+    "set": "cpp",
+    "codecvt": "cpp",
+    "fstream": "cpp"
   }
 }

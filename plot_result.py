@@ -1,29 +1,35 @@
-import matplotlib.pyplot as plt
 import os
+import matplotlib.pyplot as plt
 
-# Create the "PLOT" directory if it doesn't exist
+# Define the directory where the plot will be saved
 plot_dir = "PLOT"
 os.makedirs(plot_dir, exist_ok=True)
 
-# Read residuals from file
-def read_residuals(filename):
-    with open(filename, "r") as file:
-        return [float(line.strip()) for line in file]
+# Read residuals from files
+def read_residuals(file_path):
+    with open(file_path, 'r') as file:
+        residuals = [float(line.strip()) for line in file]
+    return residuals
 
-# Load residuals
-jacobian_residuals = read_residuals("residuals_jacobian.txt")
-cg_residuals = read_residuals("residuals_cg.txt")
+# File paths
+jacobi_file = "residuals_jacobian.txt"
+cg_file = "residuals_cg.txt"
+gs_file = "residuals_gs.txt"
+
+# Read residuals
+residuals_jacobi = read_residuals(jacobi_file)
+residuals_cg = read_residuals(cg_file)
+residuals_gs = read_residuals(gs_file)
 
 # Plot residuals
 plt.figure(figsize=(10, 6))
-plt.plot(jacobian_residuals, label="Jacobi Method", linestyle="-", marker="o", markersize=4)
-plt.plot(cg_residuals, label="Conjugate Gradient Method", linestyle="--", marker="s", markersize=4)
-
-# Labels and Title
-plt.yscale("log")  # Use logarithmic scale for better visualization
+plt.plot(residuals_jacobi, label="Jacobi")
+plt.plot(residuals_cg, label="Conjugate Gradient")
+plt.plot(residuals_gs, label="Gauss-Seidel")
+plt.yscale("log")
 plt.xlabel("Iteration")
 plt.ylabel("Residual Norm (log scale)")
-plt.title("Convergence of Jacobi vs Conjugate Gradient")
+plt.title("Convergence of Jacobi vs Conjugate Gradient vs Gauss-Seidel")
 plt.legend()
 plt.grid(True, which="both", linestyle="--", linewidth=0.5)
 
