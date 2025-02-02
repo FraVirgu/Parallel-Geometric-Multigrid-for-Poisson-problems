@@ -1,18 +1,20 @@
+#ifndef HEAD_HPP
+#define HEAD_HPP
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
-
-#define N 1000
+#include <vector>
+#include <fstream>
+#define N 200
 #define W N
 #define H N
 #define h (1.0 / N) // Ensure floating-point division
 #define L (N * N)
-#define MAX_ITERATION 100
+#define MAX_ITERATION 50000
 #define EPSILON 1e-4
 #define a 1.0
 #define p 1.0
 #define q 1.0
-
 using namespace std;
 
 double vector_norm(const double *f)
@@ -22,6 +24,7 @@ double vector_norm(const double *f)
     {
         sum += f[i] * f[i]; // Sum of squares
     }
+
     return sqrt(sum); // Square root of sum
 }
 
@@ -40,44 +43,17 @@ double compute_residual_norm(double *x, double *f)
     return sqrt(norm);
 }
 
-// Compute Jacobi iteration for a single index
-void compute_jacobian(int index, double *x, double *x_new, double *f)
+void compute_residual(double *r, double *x, double *f)
 {
-    double tmp_sum = (h * h) * f[index] + x[index - 1] + x[index + 1] + x[index - W] + x[index + W];
-    x_new[index] = 0.25 * tmp_sum;
-}
-
-// Perform Jacobi iterations
-bool Jacobian(double *x, double *x_new, double *f, int *number_iteration_performed, double *residual_reached)
-{
-    double norm_residual = 0.0;
-    for (int i = 0; i < MAX_ITERATION; i++)
+    for (int y = 1; y < H - 1; y++)
     {
-        for (int y = 1; y < H - 1; y++)
+        for (int x_pos = 1; x_pos < W - 1; x_pos++)
         {
-            for (int x_pos = 1; x_pos < W - 1; x_pos++)
-            {
-                int index = y * W + x_pos;
-                compute_jacobian(index, x, x_new, f);
-            }
-        }
-
-        norm_residual = compute_residual_norm(x_new, f);
-        *residual_reached = norm_residual;
-        //  cout << "Iteration " << i << " - Residual Norm: " << norm_residual << endl;
-
-        if (norm_residual < EPSILON)
-        {
-            *number_iteration_performed = i;
-            return true;
-        }
-
-        for (int j = 0; j < L; j++)
-        {
-            x[j] = x_new[j];
+            int index = y * W + x_pos;
+            // return the normalized residual
+            r[index] = ((h * h) * f[index] - 4 * x[index] + x[index - 1] + x[index + 1] + x[index - W] + x[index + W]);
         }
     }
-    return false;
 }
 
 // Initialize vector x to zero
@@ -88,6 +64,7 @@ void initialize_x(double *x)
         x[i] = 0.0;
     }
 }
+
 // Compute Laplacian using finite differences
 void compute_laplacian(double *f, double (*func)(double, double))
 {
@@ -123,3 +100,6 @@ void compute_laplacian(double *f, double (*func)(double, double))
         f[y * W + (W - 1)] = 0.0; // Right boundary
     }
 }
+
+// Add the missing #endif directive
+#endif

@@ -64,6 +64,10 @@
     "format": "cpp",
     "text_encoding": "cpp",
     "__nullptr": "cpp",
-    "iterativelinearsolvers": "cpp"
+    "iterativelinearsolvers": "cpp",
+    "complex": "cpp",
+    "list": "cpp",
+    "map": "cpp",
+    "set": "cpp"
   }
 }
