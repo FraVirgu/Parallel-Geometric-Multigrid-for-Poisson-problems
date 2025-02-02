@@ -38,6 +38,9 @@ int main()
     else
     {
         std::cout << "MAX_ITERATION ERROR " << std::endl;
+        std::cout << "Residual reached: " << *residual_reached << std::endl;
+        // print the differences between first residual and last residual
+        std::cout << "Residual difference: " << *residual_reached - initial_residual << std::endl;
     }
     return 0;
 }
