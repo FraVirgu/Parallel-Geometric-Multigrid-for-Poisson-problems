@@ -1,10 +1,113 @@
+#include "gauss_seidel.hpp"
 #include "jacobian.hpp"
 #include "cg.hpp"
-#include "gauss_seidel.hpp"
+
 // function prototype
 double compute_function(double x, double y)
 {
     return sin(p * M_PI * x / a) * sin(q * M_PI * y / a);
+}
+
+void JacobiCall(double *x, double *x_new, double *r, double *f, double *residual_reached, int *number_iteration_performed, std::vector<double> *residuals_jacobian)
+{
+    initialize_zeros_vector(x);
+    initialize_zeros_vector(x_new); // Ensure x_tmp is also initialized
+    initialize_zeros_vector(r);
+    cout << "_____  Jacobian:" << endl;
+    bool result = Jacobian(x, x_new, f, r, residual_reached, number_iteration_performed, residuals_jacobian);
+
+    if (result)
+    {
+        std::cout << "Number of iteration performed: " << *number_iteration_performed << std::endl;
+        std::cout << "Residual reached: " << *residual_reached << std::endl;
+    }
+    else
+    {
+        std::cout << "Did not converge within the maximum number of iterations." << std::endl;
+        std::cout << "Residual reached: " << *residual_reached << std::endl;
+    }
+}
+
+void ConjugateGradientCall(double *x, double *f, double *r, int *number_iteration_performed, double *residual_reached, std::vector<double> *residuals_cg)
+{
+    initialize_zeros_vector(x);
+    initialize_zeros_vector(r);
+    cout << "_____  Conjugate Gradient:" << endl;
+    bool result = ConjugateGradient(x, f, r, number_iteration_performed, residual_reached, residuals_cg);
+
+    if (result)
+    {
+        std::cout << "Number of iteration performed: " << *number_iteration_performed << std::endl;
+        std::cout << "Residual reached: " << *residual_reached << std::endl;
+    }
+    else
+    {
+        std::cout << "Did not converge within the maximum number of iterations." << std::endl;
+        std::cout << "Residual reached: " << *residual_reached << std::endl;
+    }
+}
+
+void GaussSeidelCall(double *x, double *f, double *r, double *residual_reached, int *number_iteration_performed, std::vector<double> *residuals_gs)
+{
+    initialize_zeros_vector(x);
+    initialize_zeros_vector(r);
+    cout << "_____  Gauss-Seidel:" << endl;
+    bool result = GaussSeidel(x, f, r, residual_reached, number_iteration_performed, residuals_gs);
+    if (result)
+    {
+        std::cout << "Number of iteration performed: " << *number_iteration_performed << std::endl;
+        std::cout << "Residual reached: " << *residual_reached << std::endl;
+    }
+    else
+    {
+        std::cout << "Did not converge within the maximum number of iterations." << std::endl;
+        std::cout << "Residual reached: " << *residual_reached << std::endl;
+    }
+}
+
+void save_residuals_to_file(std::vector<double> *residuals_jacobian, std::vector<double> *residuals_cg, std::vector<double> *residuals_gs)
+{
+    std::ofstream file_jacobian("residuals_jacobian.txt");
+    if (file_jacobian.is_open())
+    {
+        for (const auto &residual : *residuals_jacobian)
+        {
+            file_jacobian << residual << "\n";
+        }
+        file_jacobian.close();
+    }
+    else
+    {
+        std::cerr << "Unable to open file for writing Jacobian residuals.\n";
+    }
+
+    std::ofstream file_cg("residuals_cg.txt");
+    if (file_cg.is_open())
+    {
+        for (const auto &residual : *residuals_cg)
+        {
+            file_cg << residual << "\n";
+        }
+        file_cg.close();
+    }
+    else
+    {
+        std::cerr << "Unable to open file for writing Conjugate Gradient residuals.\n";
+    }
+
+    std::ofstream file_gs("residuals_gs.txt");
+    if (file_gs.is_open())
+    {
+        for (const auto &residual : *residuals_gs)
+        {
+            file_gs << residual << "\n";
+        }
+        file_gs.close();
+    }
+    else
+    {
+        std::cerr << "Unable to open file for writing Gauss-Seidel residuals.\n";
+    }
 }
 
 int main()
@@ -13,98 +116,30 @@ int main()
     std::vector<double> *residuals_jacobian = new std::vector<double>();
     std::vector<double> *residuals_cg = new std::vector<double>();
     std::vector<double> *residuals_gs = new std::vector<double>();
-    double *x = (double *)malloc(L * sizeof(double));
-    double *x_tmp = (double *)malloc(L * sizeof(double));
-    double *f = (double *)malloc(L * sizeof(double));
-    double *res = (double *)malloc(L * sizeof(double));
-    int *number_iteration_performed = (int *)malloc(1 * sizeof(int));
-    double *residual_reached = (double *)malloc(1 * sizeof(double));
+    double *x = new double[L];
+    double *x_tmp = new double[L];
+    double *x_true = new double[L];
+    double *f = new double[L];
+    double *res = new double[L];
+    int *number_iteration_performed = new int;
+    double *residual_reached = new double;
 
-    initialize_x(x);
-    initialize_x(x_tmp); // Ensure x_tmp is also initialized
-    compute_laplacian(f, compute_function);
-    cout << "_____  Jacobian:" << endl;
-    double initial_residual = compute_residual_norm(x, f);
-    bool result = Jacobian(x, x_tmp, f, residual_reached, number_iteration_performed, residuals_jacobian);
+    compute_rhs(f, compute_function);
+    compute_laplacian(x_true, compute_function);
+    double f_norm = vector_norm(f);
 
-    if (result)
-    {
-        std::cout << "Number of iteration performed: " << *number_iteration_performed << std::endl;
-        std::cout << "Residual reached: " << *residual_reached << std::endl;
-    }
-    else
-    {
-        std::cout << "Did not converge within the maximum number of iterations." << std::endl;
-        std::cout << "Residual reached: " << *residual_reached << std::endl;
-        std::cout << "initial_residual - residual_reached: " << initial_residual - *residual_reached << std::endl;
-    }
+    JacobiCall(x, x_tmp, res, f, residual_reached, number_iteration_performed, residuals_jacobian);
 
-    initialize_x(x);
-    initialize_x(x_tmp);
-    initialize_x(res);
-    compute_laplacian(f, compute_function);
-    cout << "\n_____  Conjugate Gradient:" << endl;
-    result = ConjugateGradient(x, f, number_iteration_performed, residual_reached, residuals_cg);
+    ConjugateGradientCall(x, f, res, number_iteration_performed, residual_reached, residuals_cg);
 
-    if (result)
-    {
-        std::cout << "Number of iteration performed: " << *number_iteration_performed << std::endl;
-        std::cout << "Residual reached: " << *residual_reached << std::endl;
-    }
-    else
-    {
-        std::cout << "Did not converge within the maximum number of iterations." << std::endl;
-        std::cout << "Residual reached: " << *residual_reached << std::endl;
-        // std::cout << "initial_residual - residual_reached: " << initial_residual - *residual_reached << std::endl;
-    }
-
-    initialize_x(x);
-    initialize_x(x_tmp);
-    initialize_x(res);
-    compute_laplacian(f, compute_function);
-    cout << "\n_____  Gauss-Seidel:" << endl;
-    result = GaussSeidel(x, f, residual_reached, number_iteration_performed, residuals_gs);
-    if (result)
-    {
-        std::cout << "Number of iteration performed: " << *number_iteration_performed << std::endl;
-        std::cout << "Residual reached: " << *residual_reached << std::endl;
-    }
-    else
-    {
-        std::cout << "Did not converge within the maximum number of iterations." << std::endl;
-        std::cout << "Residual reached: " << *residual_reached << std::endl;
-        // std::cout << "initial_residual - residual_reached: " << initial_residual - *residual_reached << std::endl;
-    }
+    GaussSeidelCall(x, f, res, residual_reached, number_iteration_performed, residuals_gs);
 
     free(x);
     free(x_tmp);
     free(f);
     free(number_iteration_performed);
     free(residual_reached);
-
-    // Save the result to a file
-    std::ofstream file_jacobian("residuals_jacobian.txt");
-    std::ofstream file_cg("residuals_cg.txt");
-    std::ofstream file_gs("residuals_gs.txt");
-
-    for (int i = 0; i < residuals_jacobian->size(); i++)
-    {
-        file_jacobian << residuals_jacobian->at(i) << std::endl;
-    }
-
-    for (int i = 0; i < residuals_cg->size(); i++)
-    {
-        file_cg << residuals_cg->at(i) << std::endl;
-    }
-
-    for (int i = 0; i < residuals_gs->size(); i++)
-    {
-        file_gs << residuals_gs->at(i) << std::endl;
-    }
-
-    file_jacobian.close();
-    file_cg.close();
-    file_gs.close();
+    save_residuals_to_file(residuals_jacobian, residuals_cg, residuals_gs);
 
     delete residuals_jacobian;
     delete residuals_cg;

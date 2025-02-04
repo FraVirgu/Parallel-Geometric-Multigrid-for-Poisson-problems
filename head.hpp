@@ -5,21 +5,22 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#define N 199
+#define N 100
 #define W N
 #define H N
 #define h (1.0 / N) // Ensure floating-point division
 #define L (N * N)
-#define MAX_ITERATION 50000
+#define MAX_ITERATION 1000000
 #define EPSILON 1e-4
 #define a 1.0
 #define p 1.0
 #define q 1.0
 using namespace std;
 
-double vector_norm(const double *f)
+double vector_norm(double *f)
 {
     double sum = 0.0;
+    sum = 0.0;
     for (int i = 0; i < L; i++)
     {
         sum += f[i] * f[i]; // Sum of squares
@@ -32,6 +33,7 @@ double vector_norm(const double *f)
 double compute_residual_norm(double *x, double *f)
 {
     double norm = 0.0;
+    norm = 0.0;
     for (int y = 1; y < H - 1; y++)
     {
         for (int x_pos = 1; x_pos < W - 1; x_pos++)
@@ -57,11 +59,27 @@ void compute_residual(double *r, double *x, double *f)
 }
 
 // Initialize vector x to zero
-void initialize_x(double *x)
+void initialize_zeros_vector(double *x)
 {
     for (int i = 0; i < L; i++)
     {
         x[i] = 0.0;
+    }
+}
+
+void compute_rhs(double *f, double (*func)(double, double))
+{
+    double dx = a / W;
+    double dy = a / H;
+
+    for (int y = 0; y < H; y++)
+    {
+        for (int x = 0; x < W; x++)
+        {
+            double x_val = x * dx;
+            double y_val = y * dy;
+            f[y * W + x] = func(x_val, y_val);
+        }
     }
 }
 

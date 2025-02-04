@@ -1,11 +1,11 @@
 #include "head.hpp"
 
 // Perform Jacobi iterations
-bool Jacobian(double *x, double *x_new, double *f, double *residual_reached, int *number_iteration_performed, vector<double> *residuals)
+bool Jacobian(double *x, double *x_new, double *f, double *r, double *residual_reached, int *number_iteration_performed, vector<double> *residuals)
 {
     double norm_residual;
-    double *r = new double[L]; // Residual
-    // Compute initial residual
+    // double *r = new double[L];
+    //  Compute initial residual
     compute_residual(r, x, f);
     norm_residual = vector_norm(r);
     residuals->push_back(norm_residual);
@@ -27,8 +27,8 @@ bool Jacobian(double *x, double *x_new, double *f, double *residual_reached, int
         norm_residual = vector_norm(r);
         residuals->push_back(norm_residual);
         *residual_reached = norm_residual;
-
-        // Convergence check
+        // cout << "Iteration " << i << " - Residual Norm: " << norm_residual << endl;
+        //  Convergence check
         if (norm_residual < EPSILON)
         {
             *number_iteration_performed = i;

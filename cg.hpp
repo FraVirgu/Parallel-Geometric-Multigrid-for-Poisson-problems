@@ -22,9 +22,9 @@ double compute_alpha_opt(double *r)
 }
 
 // Perform Conjugate Gradient iterations
-bool ConjugateGradient(double *x, double *f, int *number_iteration_performed, double *residual_reached, vector<double> *residuals)
+bool ConjugateGradient(double *x, double *f, double *r, int *number_iteration_performed, double *residual_reached, vector<double> *residuals)
 {
-    double *r = new double[L]; // Residual
+
     double alpha_opt;
     double norm_residual;
     double res_tmp;
@@ -63,11 +63,9 @@ bool ConjugateGradient(double *x, double *f, int *number_iteration_performed, do
         if (norm_residual < EPSILON)
         {
             *number_iteration_performed = i;
-            delete[] r;
             return true;
         }
     }
 
-    delete[] r;
     return false;
 }
