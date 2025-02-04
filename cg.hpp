@@ -22,18 +22,24 @@ double compute_alpha_opt(double *r)
 }
 
 // Perform Conjugate Gradient iterations
-bool ConjugateGradient(double *x, double *f, double *r, int *number_iteration_performed, double *residual_reached, vector<double> *residuals)
+bool ConjugateGradient(double *x, double *f, double *r, int *number_iteration_performed, double *residual_reached, vector<double> *residuals, vector<double> *errors, double *x_true)
 {
 
     double alpha_opt;
     double norm_residual;
     double res_tmp;
+    double norm_error;
+    double *err = new double[L];
     // Compute initial residual
     compute_residual(r, x, f);
     norm_residual = vector_norm(r);
     res_tmp = norm_residual;
     residuals->push_back(norm_residual);
-    cout << "Initial residual: " << norm_residual << endl;
+
+    //  Compute initial error
+    compute_difference(err, x, x_true);
+    norm_error = vector_norm(err);
+    errors->push_back(norm_error);
 
     for (int i = 0; i < MAX_ITERATION; i++)
     {
@@ -49,18 +55,28 @@ bool ConjugateGradient(double *x, double *f, double *r, int *number_iteration_pe
         compute_residual(r, x, f);
         norm_residual = vector_norm(r);
 
+        // Compute the error
+        compute_difference(err, x, x_true);
+        norm_error = vector_norm(err);
+
         // Update residual reached
         if (norm_residual <= res_tmp)
         {
             res_tmp = norm_residual;
             residuals->push_back(norm_residual);
             *residual_reached = norm_residual;
+            errors->push_back(norm_error);
         }
 
-        // cout << "Iteration " << i << " - Residual Norm: " << norm_residual << endl;
-
-        // Convergence check
+        // Convergence check (residual)
         if (norm_residual < EPSILON)
+        {
+            *number_iteration_performed = i;
+            return true;
+        }
+
+        // Convergence check (error)
+        if (norm_error < EPSILON)
         {
             *number_iteration_performed = i;
             return true;

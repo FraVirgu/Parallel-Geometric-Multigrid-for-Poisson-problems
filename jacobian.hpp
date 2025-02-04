@@ -1,15 +1,22 @@
 #include "head.hpp"
 
 // Perform Jacobi iterations
-bool Jacobian(double *x, double *x_new, double *f, double *r, double *residual_reached, int *number_iteration_performed, vector<double> *residuals)
+bool Jacobian(double *x, double *x_new, double *f, double *r, double *residual_reached, int *number_iteration_performed, vector<double> *residuals, vector<double> *errors, double *x_true)
 {
     double norm_residual;
-    // double *r = new double[L];
+    double norm_error;
+    double *err = new double[L];
+
     //  Compute initial residual
     compute_residual(r, x, f);
     norm_residual = vector_norm(r);
     residuals->push_back(norm_residual);
-    cout << "Initial residual: " << norm_residual << endl;
+
+    //  Compute initial error
+    compute_difference(err, x, x_true);
+    norm_error = vector_norm(err);
+    errors->push_back(norm_error);
+
     for (int i = 0; i < MAX_ITERATION; i++)
     {
         // Perform Jacobi iteration
@@ -27,16 +34,27 @@ bool Jacobian(double *x, double *x_new, double *f, double *r, double *residual_r
         norm_residual = vector_norm(r);
         residuals->push_back(norm_residual);
         *residual_reached = norm_residual;
-        // cout << "Iteration " << i << " - Residual Norm: " << norm_residual << endl;
-        //  Convergence check
+
+        //  Compute the error
+        compute_difference(err, x_new, x_true);
+        norm_error = vector_norm(err);
+        errors->push_back(norm_error);
+
+        //  Convergence check (residual)
         if (norm_residual < EPSILON)
         {
             *number_iteration_performed = i;
             return true;
         }
 
-        // Copy x_new to x for next iteration
+        //  Convergence check (error)
+        if (norm_error < EPSILON)
+        {
+            *number_iteration_performed = i;
+            return true;
+        }
 
+        // Copy x_new to x for next iteration
         for (int j = 0; j < L; j++)
         {
             x[j] = x_new[j];

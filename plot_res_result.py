@@ -34,7 +34,7 @@ plt.legend()
 plt.grid(True, which="both", linestyle="--", linewidth=0.5)
 
 # Save the plot as a PDF in the "PLOT" folder
-pdf_path = os.path.join(plot_dir, "convergence_plot.pdf")
+pdf_path = os.path.join(plot_dir, "RES_convergence_plot.pdf")
 plt.savefig(pdf_path, format="pdf", bbox_inches="tight")
 
 # Show the plot

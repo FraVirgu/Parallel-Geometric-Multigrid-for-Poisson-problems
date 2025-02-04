@@ -1,13 +1,21 @@
 #include "head.hpp"
 
 // Perform Gauss-Seidel iterations
-bool GaussSeidel(double *x, double *f, double *r, double *residual_reached, int *number_iteration_performed, vector<double> *residuals)
+bool GaussSeidel(double *x, double *f, double *r, double *residual_reached, int *number_iteration_performed, vector<double> *residuals, vector<double> *errors, double *x_true)
 {
     double norm_residual;
+    double *err = new double[L];
+    double norm_error;
+
+    //  Compute initial residual
     compute_residual(r, x, f);
     norm_residual = vector_norm(r);
     residuals->push_back(norm_residual);
-    cout << "Initial residual: " << norm_residual << endl;
+
+    //  Compute initial error
+    compute_difference(err, x, x_true);
+    norm_error = vector_norm(err);
+    errors->push_back(norm_error);
 
     for (int i = 0; i < MAX_ITERATION; i++)
     {
@@ -26,9 +34,21 @@ bool GaussSeidel(double *x, double *f, double *r, double *residual_reached, int 
         norm_residual = vector_norm(r);
         residuals->push_back(norm_residual);
         *residual_reached = norm_residual;
-        // cout << "Iteration " << i << " - Residual Norm: " << norm_residual << endl;
-        //  Convergence check
+
+        // Compute the error
+        compute_difference(err, x, x_true);
+        norm_error = vector_norm(err);
+        errors->push_back(norm_error);
+
+        //  Convergence check (residual)
         if (norm_residual < EPSILON)
+        {
+            *number_iteration_performed = i;
+            return true;
+        }
+
+        //  Convergence check (error)
+        if (norm_error < EPSILON)
         {
             *number_iteration_performed = i;
             return true;

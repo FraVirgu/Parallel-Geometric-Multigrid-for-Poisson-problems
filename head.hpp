@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#define N 100
+#define N 50
 #define W N
 #define H N
 #define h (1.0 / N) // Ensure floating-point division
@@ -55,6 +55,14 @@ void compute_residual(double *r, double *x, double *f)
             // return the normalized residual
             r[index] = ((h * h) * f[index] - 4 * x[index] + x[index - 1] + x[index + 1] + x[index - W] + x[index + W]);
         }
+    }
+}
+
+void compute_difference(double *error, double *x, double *x_true)
+{
+    for (int i = 0; i < L; i++)
+    {
+        error[i] = x[i] - x_true[i];
     }
 }
 
