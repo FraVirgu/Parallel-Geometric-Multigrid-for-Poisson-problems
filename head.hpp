@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#define N 200
+#define N 199
 #define W N
 #define H N
 #define h (1.0 / N) // Ensure floating-point division

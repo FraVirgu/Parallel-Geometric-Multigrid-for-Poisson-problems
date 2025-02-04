@@ -27,10 +27,11 @@ bool ConjugateGradient(double *x, double *f, int *number_iteration_performed, do
     double *r = new double[L]; // Residual
     double alpha_opt;
     double norm_residual;
-
+    double res_tmp;
     // Compute initial residual
     compute_residual(r, x, f);
     norm_residual = vector_norm(r);
+    res_tmp = norm_residual;
     residuals->push_back(norm_residual);
     cout << "Initial residual: " << norm_residual << endl;
 
@@ -47,8 +48,14 @@ bool ConjugateGradient(double *x, double *f, int *number_iteration_performed, do
         // Compute new residual
         compute_residual(r, x, f);
         norm_residual = vector_norm(r);
-        residuals->push_back(norm_residual);
-        *residual_reached = norm_residual;
+
+        // Update residual reached
+        if (norm_residual <= res_tmp)
+        {
+            res_tmp = norm_residual;
+            residuals->push_back(norm_residual);
+            *residual_reached = norm_residual;
+        }
 
         // cout << "Iteration " << i << " - Residual Norm: " << norm_residual << endl;
 
