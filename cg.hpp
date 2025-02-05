@@ -28,6 +28,7 @@ bool ConjugateGradient(double *x, double *f, double *r, int *number_iteration_pe
     double alpha_opt;
     double norm_residual;
     double res_tmp;
+    double err_tmp;
     double norm_error;
     double *err = new double[L];
     // Compute initial residual
@@ -38,7 +39,8 @@ bool ConjugateGradient(double *x, double *f, double *r, int *number_iteration_pe
 
     //  Compute initial error
     compute_difference(err, x, x_true);
-    norm_error = vector_norm(err);
+    norm_error = vector_norm(err) / vector_norm(x_true);
+    err_tmp = norm_error;
     errors->push_back(norm_error);
 
     for (int i = 0; i < MAX_ITERATION; i++)
@@ -57,7 +59,7 @@ bool ConjugateGradient(double *x, double *f, double *r, int *number_iteration_pe
 
         // Compute the error
         compute_difference(err, x, x_true);
-        norm_error = vector_norm(err);
+        norm_error = vector_norm(err) / vector_norm(x_true);
 
         // Update residual reached
         if (norm_residual <= res_tmp)
@@ -65,6 +67,11 @@ bool ConjugateGradient(double *x, double *f, double *r, int *number_iteration_pe
             res_tmp = norm_residual;
             residuals->push_back(norm_residual);
             *residual_reached = norm_residual;
+        }
+        // update error reached
+        if (norm_error <= err_tmp)
+        {
+            err_tmp = norm_error;
             errors->push_back(norm_error);
         }
 

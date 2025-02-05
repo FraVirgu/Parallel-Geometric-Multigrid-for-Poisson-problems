@@ -11,7 +11,7 @@
 #define h (1.0 / N) // Ensure floating-point division
 #define L (N * N)
 #define MAX_ITERATION 1000000
-#define EPSILON 1e-4
+#define EPSILON 1e-8
 #define a 1.0
 #define p 1.0
 #define q 1.0
@@ -74,11 +74,11 @@ void initialize_zeros_vector(double *x)
         x[i] = 0.0;
     }
 }
-
-void compute_rhs(double *f, double (*func)(double, double))
+void compute_rhs(double *f)
 {
     double dx = a / W;
     double dy = a / H;
+    double factor = (M_PI * M_PI / (a * a)) * (p * p + q * q);
 
     for (int y = 0; y < H; y++)
     {
@@ -86,7 +86,16 @@ void compute_rhs(double *f, double (*func)(double, double))
         {
             double x_val = x * dx;
             double y_val = y * dy;
-            f[y * W + x] = func(x_val, y_val);
+
+            // Apply Dirichlet boundary condition: f = 0 at the boundaries
+            if (x == 0 || x == W - 1 || y == 0 || y == H - 1)
+            {
+                f[y * W + x] = 0.0;
+            }
+            else
+            {
+                f[y * W + x] = factor * sin(p * M_PI * x_val / a) * sin(q * M_PI * y_val / a);
+            }
         }
     }
 }

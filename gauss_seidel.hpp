@@ -14,7 +14,7 @@ bool GaussSeidel(double *x, double *f, double *r, double *residual_reached, int 
 
     //  Compute initial error
     compute_difference(err, x, x_true);
-    norm_error = vector_norm(err);
+    norm_error = vector_norm(err) / vector_norm(x_true);
     errors->push_back(norm_error);
 
     for (int i = 0; i < MAX_ITERATION; i++)
@@ -37,7 +37,7 @@ bool GaussSeidel(double *x, double *f, double *r, double *residual_reached, int 
 
         // Compute the error
         compute_difference(err, x, x_true);
-        norm_error = vector_norm(err);
+        norm_error = vector_norm(err) / vector_norm(x_true);
         errors->push_back(norm_error);
 
         //  Convergence check (residual)

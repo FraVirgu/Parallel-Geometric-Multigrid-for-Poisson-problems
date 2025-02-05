@@ -174,9 +174,8 @@ int main()
     int *number_iteration_performed = new int;
     double *residual_reached = new double;
 
-    compute_rhs(f, compute_function);
+    compute_rhs(f);
     compute_laplacian(x_true, compute_function);
-    double f_norm = vector_norm(f);
 
     JacobiCall(x, x_tmp, res, f, residual_reached, number_iteration_performed, residuals_jacobian, error_jacobian, x_true);
 
