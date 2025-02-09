@@ -9,7 +9,7 @@ bool Jacobian(double *x, double *x_new, double *f, double *r, double *residual_r
 
     //  Compute initial residual
     compute_residual(r, x, f);
-    norm_residual = vector_norm(r);
+    norm_residual = vector_norm(r); // divide by the norm of the right-hand side
     residuals->push_back(norm_residual);
 
     //  Compute initial error

@@ -1,6 +1,6 @@
 #include "gauss_seidel.hpp"
 #include "jacobian.hpp"
-#include "cg.hpp"
+#include "steepest_descent.hpp"
 
 // function prototype
 double compute_function(double x, double y)
@@ -28,12 +28,12 @@ void JacobiCall(double *x, double *x_new, double *r, double *f, double *residual
     }
 }
 
-void ConjugateGradientCall(double *x, double *f, double *r, int *number_iteration_performed, double *residual_reached, std::vector<double> *residuals_cg, std::vector<double> *error_cg, double *x_true)
+void SteepestDescentCall(double *x, double *f, double *r, int *number_iteration_performed, double *residual_reached, std::vector<double> *residuals_cg, std::vector<double> *error_cg, double *x_true)
 {
     initialize_zeros_vector(x);
     initialize_zeros_vector(r);
     cout << "_____  Conjugate Gradient:" << endl;
-    bool result = ConjugateGradient(x, f, r, number_iteration_performed, residual_reached, residuals_cg, error_cg, x_true);
+    bool result = Steepest_Descent(x, f, r, number_iteration_performed, residual_reached, residuals_cg, error_cg, x_true);
 
     if (result)
     {
@@ -65,7 +65,7 @@ void GaussSeidelCall(double *x, double *f, double *r, double *residual_reached, 
     }
 }
 
-void save_residuals_to_file(std::vector<double> *residuals_jacobian, std::vector<double> *residuals_cg, std::vector<double> *residuals_gs)
+void save_residuals_to_file(std::vector<double> *residuals_jacobian, std::vector<double> *residuals_steepest, std::vector<double> *residuals_gs)
 {
     std::ofstream file_jacobian("residuals_jacobian.txt");
     if (file_jacobian.is_open())
@@ -81,10 +81,10 @@ void save_residuals_to_file(std::vector<double> *residuals_jacobian, std::vector
         std::cerr << "Unable to open file for writing Jacobian residuals.\n";
     }
 
-    std::ofstream file_cg("residuals_cg.txt");
+    std::ofstream file_cg("residuals_steepest_descent.txt");
     if (file_cg.is_open())
     {
-        for (const auto &residual : *residuals_cg)
+        for (const auto &residual : *residuals_steepest)
         {
             file_cg << residual << "\n";
         }
@@ -110,7 +110,7 @@ void save_residuals_to_file(std::vector<double> *residuals_jacobian, std::vector
     }
 }
 
-void save_error_to_file(std::vector<double> *error_jacobian, std::vector<double> *error_cg, std::vector<double> *error_gs)
+void save_error_to_file(std::vector<double> *error_jacobian, std::vector<double> *error_steepest, std::vector<double> *error_gs)
 {
     std::ofstream file_jacobian("error_jacobian.txt");
     if (file_jacobian.is_open())
@@ -126,10 +126,10 @@ void save_error_to_file(std::vector<double> *error_jacobian, std::vector<double>
         std::cerr << "Unable to open file for writing Jacobian errors.\n";
     }
 
-    std::ofstream file_cg("error_cg.txt");
+    std::ofstream file_cg("error_steepest_descent.txt");
     if (file_cg.is_open())
     {
-        for (const auto &error : *error_cg)
+        for (const auto &error : *error_steepest)
         {
             file_cg << error << "\n";
         }
@@ -159,11 +159,11 @@ int main()
 {
 
     std::vector<double> *residuals_jacobian = new std::vector<double>();
-    std::vector<double> *residuals_cg = new std::vector<double>();
+    std::vector<double> *residuals_steepest = new std::vector<double>();
     std::vector<double> *residuals_gs = new std::vector<double>();
 
     std::vector<double> *error_jacobian = new std::vector<double>();
-    std::vector<double> *error_cg = new std::vector<double>();
+    std::vector<double> *error_steepest = new std::vector<double>();
     std::vector<double> *error_gs = new std::vector<double>();
 
     double *x = new double[L];
@@ -179,7 +179,7 @@ int main()
 
     JacobiCall(x, x_tmp, res, f, residual_reached, number_iteration_performed, residuals_jacobian, error_jacobian, x_true);
 
-    ConjugateGradientCall(x, f, res, number_iteration_performed, residual_reached, residuals_cg, error_cg, x_true);
+    SteepestDescentCall(x, f, res, number_iteration_performed, residual_reached, residuals_steepest, error_steepest, x_true);
 
     GaussSeidelCall(x, f, res, residual_reached, number_iteration_performed, residuals_gs, error_gs, x_true);
 
@@ -188,11 +188,11 @@ int main()
     free(f);
     free(number_iteration_performed);
     free(residual_reached);
-    save_residuals_to_file(residuals_jacobian, residuals_cg, residuals_gs);
-    save_error_to_file(error_jacobian, error_cg, error_gs);
+    save_residuals_to_file(residuals_jacobian, residuals_steepest, residuals_gs);
+    save_error_to_file(error_jacobian, error_steepest, error_gs);
 
     delete residuals_jacobian;
-    delete residuals_cg;
+    delete residuals_steepest;
     delete residuals_gs;
 
     return 0;

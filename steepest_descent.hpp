@@ -21,8 +21,10 @@ double compute_alpha_opt(double *r)
     return numerator / denominator;
 }
 
+// THIS IS NOT THE CG IS JUST THE GRADIENT DESCENT !!!
+
 // Perform Conjugate Gradient iterations
-bool ConjugateGradient(double *x, double *f, double *r, int *number_iteration_performed, double *residual_reached, vector<double> *residuals, vector<double> *errors, double *x_true)
+bool Steepest_Descent(double *x, double *f, double *r, int *number_iteration_performed, double *residual_reached, vector<double> *residuals, vector<double> *errors, double *x_true)
 {
 
     double alpha_opt;

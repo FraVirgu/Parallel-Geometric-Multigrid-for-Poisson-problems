@@ -5,13 +5,13 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#define N 50
+#define N 100
 #define W N
 #define H N
-#define h (1.0 / N) // Ensure floating-point division
+#define h (1.0 / (N - 1)) // Ensure floating-point division
 #define L (N * N)
 #define MAX_ITERATION 1000000
-#define EPSILON 1e-8
+#define EPSILON 1e-4
 #define a 1.0
 #define p 1.0
 #define q 1.0
