@@ -2,7 +2,7 @@
 
 int main()
 {
-    singleRun();
-    // multipleRun();
+    //singleRun();
+    multipleRun();
     return 0;
 }
