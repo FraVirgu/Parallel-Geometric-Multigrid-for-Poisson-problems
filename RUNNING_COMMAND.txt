@@ -1,0 +1,8 @@
+// CPP
+g++ main.cpp -o main
+./main
+
+
+// PYTHON 
+python3 plot_res_result.py 
+python3 plot_err_result.py 
