@@ -206,7 +206,7 @@ void save_error_to_file(std::vector<double> *error_jacobian, std::vector<double>
     }
 }
 
-void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, std::vector<std::pair<int, double>> &timings_gs, std::vector<std::pair<int, double>> &timings_steepest, std::vector<std::pair<int, double>> &timings_cg)
+void save_timings_to_file(std::vector<std::pair<int, double> > &timings_jacobi, std::vector<std::pair<int, double> > &timings_gs, std::vector<std::pair<int, double> > &timings_steepest, std::vector<std::pair<int, double> > &timings_cg)
 {
     std::ofstream file_jacobian("timings_jacobian.txt");
     if (file_jacobian.is_open())
@@ -335,7 +335,7 @@ void singleRun()
     delete residuals_gs;
 }
 
-void timeSingleRun(std::vector<std::pair<int, double>> &timings_jacobi, std::vector<std::pair<int, double>> &timings_gs, std::vector<std::pair<int, double>> &timings_steepest, std::vector<std::pair<int, double>> &timings_cg)
+void timeSingleRun(std::vector<std::pair<int, double> > &timings_jacobi, std::vector<std::pair<int, double> > &timings_gs, std::vector<std::pair<int, double> > &timings_steepest, std::vector<std::pair<int, double> > &timings_cg)
 {
     std::vector<double> *residuals_jacobian = new std::vector<double>();
     std::vector<double> *residuals_steepest = new std::vector<double>();
@@ -402,10 +402,10 @@ void timeSingleRun(std::vector<std::pair<int, double>> &timings_jacobi, std::vec
 void multipleRun()
 {
     vector<int> n = n_initialization();
-    std::vector<std::pair<int, double>> timings_jacobi;
-    std::vector<std::pair<int, double>> timings_gs;
-    std::vector<std::pair<int, double>> timings_steepest;
-    std::vector<std::pair<int, double>> timings_cg;
+    std::vector<std::pair<int, double> > timings_jacobi;
+    std::vector<std::pair<int, double> > timings_gs;
+    std::vector<std::pair<int, double> > timings_steepest;
+    std::vector<std::pair<int, double> > timings_cg;
 
     for (int i = 0; i < n.size(); i++)
     {
