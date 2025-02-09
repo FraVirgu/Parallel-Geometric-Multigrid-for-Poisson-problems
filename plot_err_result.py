@@ -15,21 +15,24 @@ def read_residuals(file_path):
 jacobi_file = "error_jacobian.txt"
 steepest_descent_file = "error_steepest_descent.txt"
 gs_file = "error_gs.txt"
+cg_file = "error_cg.txt"
 
 # Read residuals
 residuals_jacobi = read_residuals(jacobi_file)
 residuals_cg = read_residuals(steepest_descent_file)
 residuals_gs = read_residuals(gs_file)
+residuals_cg_method = read_residuals(cg_file)
 
 # Plot residuals
 plt.figure(figsize=(10, 6))
 plt.plot(residuals_jacobi, label="Jacobi")
 plt.plot(residuals_cg, label="Steepest Descent")
 plt.plot(residuals_gs, label="Gauss-Seidel")
+plt.plot(residuals_cg_method, label="Conjugate Gradient", linestyle="--")
 plt.yscale("log")
 plt.xlabel("Iteration")
 plt.ylabel("Err Norm (log scale)")
-plt.title("Convergence of Jacobi vs Steepest Descent vs Gauss-Seidel")
+plt.title("Convergence of Iterative Methods")
 plt.legend()
 plt.grid(True, which="both", linestyle="--", linewidth=0.5)
 

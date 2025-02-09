@@ -6,3 +6,4 @@ g++ main.cpp globals.cpp -o main
 // PYTHON 
 python3 plot_res_result.py 
 python3 plot_err_result.py 
+python3 plot_time_output.py 
