@@ -1,17 +1,46 @@
 #include "head.hpp"
 
-bool conjugate_gradient(double *x, double *f, double *r, int *number_iteration_performed, double *residual_reached, vector<double> *residuals)
+// Function to compute the standard inner product
+double compute_inner_product(const double *v1, const double *v2)
+{
+    double result = 0.0;
+    for (int i = 0; i < L; i++)
+    {
+        result += v1[i] * v2[i];
+    }
+    return result;
+}
+
+// Function to compute the inner product with A where A * r is calculated using the Laplacian
+void compute_inner_product_with_A(double *r, double *result)
+{
+    for (int y = 1; y < H - 1; y++)
+    {
+        for (int x_pos = 1; x_pos < W - 1; x_pos++)
+        {
+            int index = y * W + x_pos;
+
+            // Apply Laplacian operator (A * r) using the same stencil
+            result[index] = -4 * r[index] + r[index - 1] + r[index + 1] + r[index - W] + r[index + W];
+        }
+    }
+}
+
+bool conjugate_gradient(double *x, double *f, double *r, double *p_d, double *Ap_d, int *number_iteration_performed, double *residual_reached, vector<double> *residuals, std::vector<double> *error_cg, double *x_true)
 {
     double alpha, beta, norm_residual, res_tmp, err_tmp, norm_error;
     double *err = new double[L];
-    double *p_d = new double[L];  // Search direction
-    double *Ap_d = new double[L]; // Matrix-vector product
-
     // Compute initial residual: r = f - A * x
     compute_residual(r, x, f);
     norm_residual = vector_norm(r);
     res_tmp = norm_residual;
     residuals->push_back(norm_residual);
+
+    // compute initial error
+    compute_difference(err, x, x_true);
+    norm_error = vector_norm(err) / vector_norm(x_true);
+    err_tmp = norm_error;
+    error_cg->push_back(norm_error);
 
     // Initialize search direction: p = r
     for (int j = 0; j < L; j++)
@@ -43,17 +72,33 @@ bool conjugate_gradient(double *x, double *f, double *r, int *number_iteration_p
             r[j] -= alpha * Ap_d[j];
         }
 
+        // Compute new residual
         norm_residual = vector_norm(r);
-        residuals->push_back(norm_residual);
+
+        // Compute the error
+        compute_difference(err, x, x_true);
+        norm_error = vector_norm(err) / vector_norm(x_true);
+
+        // Update residual reached
+        if (norm_residual <= res_tmp)
+        {
+            res_tmp = norm_residual;
+            residuals->push_back(norm_residual);
+            *residual_reached = norm_residual;
+        }
+        // update error reached
+        if (norm_error <= err_tmp)
+        {
+            err_tmp = norm_error;
+            error_cg->push_back(norm_error);
+        }
 
         // Convergence check
         if (norm_residual < EPSILON)
         {
             *residual_reached = norm_residual;
             *number_iteration_performed = i;
-            delete[] err;
-            delete[] p_d;
-            delete[] Ap_d;
+
             return true;
         }
 
@@ -68,34 +113,5 @@ bool conjugate_gradient(double *x, double *f, double *r, int *number_iteration_p
         }
     }
 
-    delete[] err;
-    delete[] p_d;
-    delete[] Ap_d;
     return false;
-}
-
-// Function to compute the standard inner product
-double compute_inner_product(const double *v1, const double *v2)
-{
-    double result = 0.0;
-    for (int i = 0; i < L; i++)
-    {
-        result += v1[i] * v2[i];
-    }
-    return result;
-}
-
-// Function to compute the inner product with A where A * r is calculated using the Laplacian
-void compute_inner_product_with_A(double *r, double *result)
-{
-    for (int y = 1; y < H - 1; y++)
-    {
-        for (int x_pos = 1; x_pos < W - 1; x_pos++)
-        {
-            int index = y * W + x_pos;
-
-            // Apply Laplacian operator (A * r) using the same stencil
-            result[index] = -4 * r[index] + r[index - 1] + r[index + 1] + r[index - W] + r[index + W];
-        }
-    }
 }
