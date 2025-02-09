@@ -34,7 +34,7 @@ void SteepestDescentCall(double *x, double *f, double *r, int *number_iteration_
 {
     initialize_zeros_vector(x);
     initialize_zeros_vector(r);
-    cout << "_____  Conjugate Gradient:" << endl;
+    cout << "_____  Steepest-Descent :" << endl;
     bool result = Steepest_Descent(x, f, r, number_iteration_performed, residual_reached, residuals_cg, error_cg, x_true);
 
     if (result)
@@ -206,7 +206,7 @@ void save_error_to_file(std::vector<double> *error_jacobian, std::vector<double>
     }
 }
 
-void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, std::vector<std::pair<int, double>> &timings_gs, std::vector<std::pair<int, double>> &timings_steepest)
+void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, std::vector<std::pair<int, double>> &timings_gs, std::vector<std::pair<int, double>> &timings_steepest, std::vector<std::pair<int, double>> &timings_cg)
 {
     std::ofstream file_jacobian("timings_jacobian.txt");
     if (file_jacobian.is_open())
@@ -222,18 +222,18 @@ void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, s
         std::cerr << "Unable to open file for writing Jacobian timings.\n";
     }
 
-    std::ofstream file_cg("timings_steepest_descent.txt");
-    if (file_cg.is_open())
+    std::ofstream file_steepest("timings_steepest_descent.txt");
+    if (file_steepest.is_open())
     {
         for (const auto &timing : timings_steepest)
         {
-            file_cg << timing.first << " " << timing.second << "\n";
+            file_steepest << timing.first << " " << timing.second << "\n";
         }
-        file_cg.close();
+        file_steepest.close();
     }
     else
     {
-        std::cerr << "Unable to open file for writing Conjugate Gradient timings.\n";
+        std::cerr << "Unable to open file for writing Steepest Descent timings.\n";
     }
 
     std::ofstream file_gs("timings_gs.txt");
@@ -249,12 +249,26 @@ void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, s
     {
         std::cerr << "Unable to open file for writing Gauss-Seidel timings.\n";
     }
+
+    std::ofstream file_cg("timings_cg.txt");
+    if (file_cg.is_open())
+    {
+        for (const auto &timing : timings_cg)
+        {
+            file_cg << timing.first << " " << timing.second << "\n";
+        }
+        file_cg.close();
+    }
+    else
+    {
+        std::cerr << "Unable to open file for writing Conjugate Gradient timings.\n";
+    }
 }
 
 vector<int> n_initialization()
 {
     vector<int> n;
-    for (int i = 0; i < 200; i = i + 20)
+    for (int i = 0; i < 220; i = i + 20)
     {
         n.push_back(i);
     }
@@ -338,6 +352,8 @@ void timeSingleRun(std::vector<std::pair<int, double>> &timings_jacobi, std::vec
     double *x_true = new double[L];
     double *f = new double[L];
     double *res = new double[L];
+    double *p_d = new double[L];
+    double *Ap_d = new double[L];
     int *number_iteration_performed = new int;
     double *residual_reached = new double;
 
@@ -366,7 +382,7 @@ void timeSingleRun(std::vector<std::pair<int, double>> &timings_jacobi, std::vec
 
     // Conjugate Gradient
     auto start_cg = std::chrono::high_resolution_clock::now();
-    ConiugateGradientCall(x, f, res, x, x, residual_reached, number_iteration_performed, residuals_cg, error_cg, x_true);
+    ConiugateGradientCall(x, f, res, p_d, Ap_d, residual_reached, number_iteration_performed, residuals_cg, error_cg, x_true);
     auto end_cg = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_cg = end_cg - start_cg;
     timings_cg.push_back(std::make_pair(N, elapsed_cg.count()));
@@ -394,9 +410,9 @@ void multipleRun()
     for (int i = 0; i < n.size(); i++)
     {
         parameter_initialization(n[i], 100000, 1e-4, 1.0, 1.0, 1.0);
-        cout << "______ N: " << N << endl;
+        cout << "\t\t\t\t\t\t\t\t\t   N: " << N << endl;
         timeSingleRun(timings_jacobi, timings_gs, timings_steepest, timings_cg);
     }
 
-    save_timings_to_file(timings_jacobi, timings_gs, timings_steepest);
+    save_timings_to_file(timings_jacobi, timings_gs, timings_steepest, timings_cg);
 }
