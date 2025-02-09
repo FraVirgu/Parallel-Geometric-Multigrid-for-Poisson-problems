@@ -5,16 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#define N 100
-#define W N
-#define H N
-#define h (1.0 / (N - 1)) // Ensure floating-point division
-#define L (N * N)
-#define MAX_ITERATION 1000000
-#define EPSILON 1e-4
-#define a 1.0
-#define p 1.0
-#define q 1.0
+#include "globals.hpp"
+
 using namespace std;
 
 double vector_norm(double *f)

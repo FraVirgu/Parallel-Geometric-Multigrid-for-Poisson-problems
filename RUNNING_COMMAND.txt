@@ -1,5 +1,5 @@
 // CPP
-g++ main.cpp -o main
+g++ main.cpp globals.cpp -o main
 ./main
 
 
