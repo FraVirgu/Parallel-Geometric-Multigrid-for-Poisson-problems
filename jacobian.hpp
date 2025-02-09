@@ -17,50 +17,87 @@ bool Jacobian(double *x, double *x_new, double *f, double *r, double *residual_r
     norm_error = vector_norm(err) / vector_norm(x_true);
     errors->push_back(norm_error);
 
-    for (int i = 0; i < MAX_ITERATION; i++)
+    if (!fix_iteration)
     {
-        // Perform Jacobi iteration
-        for (int y = 1; y < H - 1; y++)
+
+        for (int i = 0; i < MAX_ITERATION; i++)
         {
-            for (int x_pos = 1; x_pos < W - 1; x_pos++)
+            // Perform Jacobi iteration
+            for (int y = 1; y < H - 1; y++)
             {
-                int index = y * W + x_pos;
-                x_new[index] = 0.25 * ((h * h * f[index]) + x[index - 1] + x[index + 1] + x[index - W] + x[index + W]);
+                for (int x_pos = 1; x_pos < W - 1; x_pos++)
+                {
+                    int index = y * W + x_pos;
+                    x_new[index] = 0.25 * ((h * h * f[index]) + x[index - 1] + x[index + 1] + x[index - W] + x[index + W]);
+                }
+            }
+
+            // Compute new residual
+            compute_residual(r, x_new, f);
+            norm_residual = vector_norm(r);
+            residuals->push_back(norm_residual);
+            *residual_reached = norm_residual;
+
+            //  Compute the error
+            compute_difference(err, x_new, x_true);
+            norm_error = vector_norm(err) / vector_norm(x_true);
+
+            errors->push_back(norm_error);
+
+            //  Convergence check (residual)
+            if (norm_residual < EPSILON)
+            {
+                *number_iteration_performed = i;
+                return true;
+            }
+
+            //  Convergence check (error)
+            if (norm_error < EPSILON)
+            {
+                *number_iteration_performed = i;
+                return true;
+            }
+
+            // Copy x_new to x for next iteration
+            for (int j = 0; j < L; j++)
+            {
+                x[j] = x_new[j];
             }
         }
-
-        // Compute new residual
-        compute_residual(r, x_new, f);
-        norm_residual = vector_norm(r);
-        residuals->push_back(norm_residual);
-        *residual_reached = norm_residual;
-
-        //  Compute the error
-        compute_difference(err, x_new, x_true);
-        norm_error = vector_norm(err) / vector_norm(x_true);
-
-        errors->push_back(norm_error);
-
-        //  Convergence check (residual)
-        if (norm_residual < EPSILON)
-        {
-            *number_iteration_performed = i;
-            return true;
-        }
-
-        //  Convergence check (error)
-        if (norm_error < EPSILON)
-        {
-            *number_iteration_performed = i;
-            return true;
-        }
-
-        // Copy x_new to x for next iteration
-        for (int j = 0; j < L; j++)
-        {
-            x[j] = x_new[j];
-        }
+        return false;
     }
+    else
+    {
+        for (int i = 0; i < number_fixed_iteration; i++)
+        {
+            // Perform Jacobi iteration
+            for (int y = 1; y < H - 1; y++)
+            {
+                for (int x_pos = 1; x_pos < W - 1; x_pos++)
+                {
+                    int index = y * W + x_pos;
+                    x_new[index] = 0.25 * ((h * h * f[index]) + x[index - 1] + x[index + 1] + x[index - W] + x[index + W]);
+                }
+            }
 
-    return false;
+            // Compute new residual
+            compute_residual(r, x_new, f);
+            norm_residual = vector_norm(r);
+            residuals->push_back(norm_residual);
+            *residual_reached = norm_residual;
+
+            //  Compute the error
+            compute_difference(err, x_new, x_true);
+            norm_error = vector_norm(err) / vector_norm(x_true);
+
+            errors->push_back(norm_error);
+
+            // Copy x_new to x for next iteration
+            for (int j = 0; j < L; j++)
+            {
+                x[j] = x_new[j];
+            }
+        }
+        return true;
+    }
 }

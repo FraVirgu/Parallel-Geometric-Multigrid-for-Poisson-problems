@@ -8,3 +8,5 @@ extern double EPSILON;
 extern double a;
 extern double p;
 extern double q;
+extern bool fix_iteration;
+extern int number_fixed_iteration;

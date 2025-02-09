@@ -9,3 +9,5 @@ double EPSILON = 1e-4;
 double a = 1.0;
 double p = 1.0;
 double q = 1.0;
+bool fix_iteration = false;
+int number_fixed_iteration = 10;
