@@ -268,7 +268,6 @@ void singleRun()
     delete residuals_gs;
 }
 
-// Run the simulation for multiple N values and save the time execution for each method
 void timeSingleRun(std::vector<std::pair<int, double>> &timings_jacobi, std::vector<std::pair<int, double>> &timings_gs, std::vector<std::pair<int, double>> &timings_steepest)
 {
     std::vector<double> *residuals_jacobian = new std::vector<double>();
@@ -323,6 +322,7 @@ void timeSingleRun(std::vector<std::pair<int, double>> &timings_jacobi, std::vec
     delete residuals_gs;
 }
 
+// Run the simulation for multiple N values and save the time execution for each method
 void multipleRun()
 {
     vector<int> n = n_initialization();
