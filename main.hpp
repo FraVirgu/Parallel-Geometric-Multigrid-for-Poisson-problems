@@ -326,7 +326,7 @@ void save_error_h_to_file(std::vector<std::pair<int, double>> &error_j, std::vec
 vector<int> n_initialization()
 {
     vector<int> n;
-    for (int i = 0; i < 220; i = i + 20)
+    for (int i = 0; i < 140; i = i + 20)
     {
         n.push_back(i);
     }
