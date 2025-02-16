@@ -20,10 +20,11 @@ def read_timings(file_path):
     return timings
 
 # File paths
-timings_jacobi_file = "timings_jacobian.txt"
-timings_steepest_file = "timings_steepest_descent.txt"
-timings_gs_file = "timings_gs.txt"
-timings_cg_file = "timings_cg.txt"
+output_dir = "OUTPUT_RESULT"
+timings_jacobi_file = os.path.join(output_dir, "timings_jacobian.txt")
+timings_steepest_file = os.path.join(output_dir, "timings_steepest_descent.txt")
+timings_gs_file = os.path.join(output_dir, "timings_gs.txt")
+timings_cg_file = os.path.join(output_dir, "timings_cg.txt")
 
 # Read timings
 timings_jacobi = read_timings(timings_jacobi_file)

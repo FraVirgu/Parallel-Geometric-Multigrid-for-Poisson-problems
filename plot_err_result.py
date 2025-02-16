@@ -10,12 +10,11 @@ def read_residuals(file_path):
     with open(file_path, 'r') as file:
         residuals = [float(line.strip()) for line in file]
     return residuals
-
 # File paths
-jacobi_file = "error_jacobian.txt"
-steepest_descent_file = "error_steepest_descent.txt"
-gs_file = "error_gs.txt"
-cg_file = "error_cg.txt"
+jacobi_file = os.path.join("OUTPUT_RESULT", "error_jacobian.txt")
+steepest_descent_file = os.path.join("OUTPUT_RESULT", "error_steepest_descent.txt")
+gs_file = os.path.join("OUTPUT_RESULT", "error_gs.txt")
+cg_file = os.path.join("OUTPUT_RESULT", "error_cg.txt")
 
 # Read residuals
 residuals_jacobi = read_residuals(jacobi_file)

@@ -4,6 +4,10 @@
 #include "steepest_descent.hpp"
 #include "conjugate_gradient.hpp"
 #include <chrono>
+
+#include <sys/stat.h>
+#include <sys/types.h>
+
 // function prototype
 double compute_function(double x, double y)
 {
@@ -88,9 +92,20 @@ void ConiugateGradientCall(double *x, double *f, double *r, double *p_d, double 
     }
 }
 
+void create_directory_if_not_exists(const std::string &path)
+{
+    struct stat info;
+    if (stat(path.c_str(), &info) != 0)
+    {
+        mkdir(path.c_str(), 0777);
+    }
+}
+
 void save_residuals_to_file(std::vector<double> *residuals_jacobian, std::vector<double> *residuals_steepest, std::vector<double> *residuals_gs, std::vector<double> *residuals_cg)
 {
-    std::ofstream file_jacobian("residuals_jacobian.txt");
+    create_directory_if_not_exists("OUTPUT_RESULT");
+
+    std::ofstream file_jacobian("OUTPUT_RESULT/residuals_jacobian.txt");
     if (file_jacobian.is_open())
     {
         for (const auto &residual : *residuals_jacobian)
@@ -104,21 +119,21 @@ void save_residuals_to_file(std::vector<double> *residuals_jacobian, std::vector
         std::cerr << "Unable to open file for writing Jacobian residuals.\n";
     }
 
-    std::ofstream file_cg("residuals_steepest_descent.txt");
-    if (file_cg.is_open())
+    std::ofstream file_steepest("OUTPUT_RESULT/residuals_steepest_descent.txt");
+    if (file_steepest.is_open())
     {
         for (const auto &residual : *residuals_steepest)
         {
-            file_cg << residual << "\n";
+            file_steepest << residual << "\n";
         }
-        file_cg.close();
+        file_steepest.close();
     }
     else
     {
-        std::cerr << "Unable to open file for writing Conjugate Gradient residuals.\n";
+        std::cerr << "Unable to open file for writing Steepest Descent residuals.\n";
     }
 
-    std::ofstream file_gs("residuals_gs.txt");
+    std::ofstream file_gs("OUTPUT_RESULT/residuals_gs.txt");
     if (file_gs.is_open())
     {
         for (const auto &residual : *residuals_gs)
@@ -132,14 +147,14 @@ void save_residuals_to_file(std::vector<double> *residuals_jacobian, std::vector
         std::cerr << "Unable to open file for writing Gauss-Seidel residuals.\n";
     }
 
-    std::ofstream file_cg_residuals("residuals_cg.txt");
-    if (file_cg_residuals.is_open())
+    std::ofstream file_cg("OUTPUT_RESULT/residuals_cg.txt");
+    if (file_cg.is_open())
     {
         for (const auto &residual : *residuals_cg)
         {
-            file_cg_residuals << residual << "\n";
+            file_cg << residual << "\n";
         }
-        file_cg_residuals.close();
+        file_cg.close();
     }
     else
     {
@@ -149,7 +164,9 @@ void save_residuals_to_file(std::vector<double> *residuals_jacobian, std::vector
 
 void save_error_to_file(std::vector<double> *error_jacobian, std::vector<double> *error_steepest, std::vector<double> *error_gs, std::vector<double> *error_cg)
 {
-    std::ofstream file_jacobian("error_jacobian.txt");
+    create_directory_if_not_exists("OUTPUT_RESULT");
+
+    std::ofstream file_jacobian("OUTPUT_RESULT/error_jacobian.txt");
     if (file_jacobian.is_open())
     {
         for (const auto &error : *error_jacobian)
@@ -163,21 +180,21 @@ void save_error_to_file(std::vector<double> *error_jacobian, std::vector<double>
         std::cerr << "Unable to open file for writing Jacobian errors.\n";
     }
 
-    std::ofstream file_cg("error_steepest_descent.txt");
-    if (file_cg.is_open())
+    std::ofstream file_steepest("OUTPUT_RESULT/error_steepest_descent.txt");
+    if (file_steepest.is_open())
     {
         for (const auto &error : *error_steepest)
         {
-            file_cg << error << "\n";
+            file_steepest << error << "\n";
         }
-        file_cg.close();
+        file_steepest.close();
     }
     else
     {
-        std::cerr << "Unable to open file for writing Conjugate Gradient errors.\n";
+        std::cerr << "Unable to open file for writing Steepest Descent errors.\n";
     }
 
-    std::ofstream file_gs("error_gs.txt");
+    std::ofstream file_gs("OUTPUT_RESULT/error_gs.txt");
     if (file_gs.is_open())
     {
         for (const auto &error : *error_gs)
@@ -191,23 +208,26 @@ void save_error_to_file(std::vector<double> *error_jacobian, std::vector<double>
         std::cerr << "Unable to open file for writing Gauss-Seidel errors.\n";
     }
 
-    std::ofstream file_cg_residuals("error_cg.txt");
-    if (file_cg_residuals.is_open())
+    std::ofstream file_cg("OUTPUT_RESULT/error_cg.txt");
+    if (file_cg.is_open())
     {
         for (const auto &error : *error_cg)
         {
-            file_cg_residuals << error << "\n";
+            file_cg << error << "\n";
         }
-        file_cg_residuals.close();
+        file_cg.close();
     }
     else
     {
         std::cerr << "Unable to open file for writing Conjugate Gradient errors.\n";
     }
 }
+
 void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, std::vector<std::pair<int, double>> &timings_gs, std::vector<std::pair<int, double>> &timings_steepest, std::vector<std::pair<int, double>> &timings_cg)
 {
-    std::ofstream file_jacobian("timings_jacobian.txt");
+    create_directory_if_not_exists("OUTPUT_RESULT");
+
+    std::ofstream file_jacobian("OUTPUT_RESULT/timings_jacobian.txt");
     if (file_jacobian.is_open())
     {
         for (const auto &timing : timings_jacobi)
@@ -221,7 +241,7 @@ void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, s
         std::cerr << "Unable to open file for writing Jacobian timings.\n";
     }
 
-    std::ofstream file_steepest("timings_steepest_descent.txt");
+    std::ofstream file_steepest("OUTPUT_RESULT/timings_steepest_descent.txt");
     if (file_steepest.is_open())
     {
         for (const auto &timing : timings_steepest)
@@ -235,7 +255,7 @@ void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, s
         std::cerr << "Unable to open file for writing Steepest Descent timings.\n";
     }
 
-    std::ofstream file_gs("timings_gs.txt");
+    std::ofstream file_gs("OUTPUT_RESULT/timings_gs.txt");
     if (file_gs.is_open())
     {
         for (const auto &timing : timings_gs)
@@ -249,7 +269,7 @@ void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, s
         std::cerr << "Unable to open file for writing Gauss-Seidel timings.\n";
     }
 
-    std::ofstream file_cg("timings_cg.txt");
+    std::ofstream file_cg("OUTPUT_RESULT/timings_cg.txt");
     if (file_cg.is_open())
     {
         for (const auto &timing : timings_cg)
@@ -266,7 +286,9 @@ void save_timings_to_file(std::vector<std::pair<int, double>> &timings_jacobi, s
 
 void save_error_h_to_file(std::vector<std::pair<int, double>> &error_j, std::vector<std::pair<int, double>> &error_gs, std::vector<std::pair<int, double>> &error_steepest, std::vector<std::pair<int, double>> &error_cg)
 {
-    std::ofstream file_jacobian("h_errors_jacobian.txt");
+    create_directory_if_not_exists("OUTPUT_RESULT");
+
+    std::ofstream file_jacobian("OUTPUT_RESULT/h_errors_jacobian.txt");
     if (file_jacobian.is_open())
     {
         for (const auto &error : error_j)
@@ -280,7 +302,7 @@ void save_error_h_to_file(std::vector<std::pair<int, double>> &error_j, std::vec
         std::cerr << "Unable to open file for writing Jacobian errors.\n";
     }
 
-    std::ofstream file_steepest("h_errors_steepest_descent.txt");
+    std::ofstream file_steepest("OUTPUT_RESULT/h_errors_steepest_descent.txt");
     if (file_steepest.is_open())
     {
         for (const auto &error : error_steepest)
@@ -294,7 +316,7 @@ void save_error_h_to_file(std::vector<std::pair<int, double>> &error_j, std::vec
         std::cerr << "Unable to open file for writing Steepest Descent errors.\n";
     }
 
-    std::ofstream file_gs("h_errors_gs.txt");
+    std::ofstream file_gs("OUTPUT_RESULT/h_errors_gs.txt");
     if (file_gs.is_open())
     {
         for (const auto &error : error_gs)
@@ -308,7 +330,7 @@ void save_error_h_to_file(std::vector<std::pair<int, double>> &error_j, std::vec
         std::cerr << "Unable to open file for writing Gauss-Seidel errors.\n";
     }
 
-    std::ofstream file_cg("h_errors_cg.txt");
+    std::ofstream file_cg("OUTPUT_RESULT/h_errors_cg.txt");
     if (file_cg.is_open())
     {
         for (const auto &error : error_cg)
@@ -517,7 +539,6 @@ void multipleRun()
     }
 
     save_timings_to_file(timings_jacobi, timings_gs, timings_steepest, timings_cg);
-    save_error_h_to_file(error_j, error_gs, error_steepest, error_cg);
 }
 
 // Run the simulation for multiple N values and save the time execution for each method
@@ -543,6 +564,5 @@ void multipleRun_h()
         timeSingleRun_H(error_j);
     }
 
-    save_timings_to_file(timings_jacobi, timings_gs, timings_steepest, timings_cg);
     save_error_h_to_file(error_j, error_gs, error_steepest, error_cg);
 }

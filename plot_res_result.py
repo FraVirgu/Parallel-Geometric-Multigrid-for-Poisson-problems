@@ -12,10 +12,11 @@ def read_residuals(file_path):
     return residuals
 
 # File paths
-jacobi_file = "residuals_jacobian.txt"
-steepest_file = "residuals_steepest_descent.txt"
-gs_file = "residuals_gs.txt"
-cg_file = "residuals_cg.txt"
+output_dir = "OUTPUT_RESULT"
+jacobi_file = os.path.join(output_dir, "residuals_jacobian.txt")
+steepest_file = os.path.join(output_dir, "residuals_steepest_descent.txt")
+gs_file = os.path.join(output_dir, "residuals_gs.txt")
+cg_file = os.path.join(output_dir, "residuals_cg.txt")
 # Read residuals
 residuals_jacobi = read_residuals(jacobi_file)
 residuals_steepest = read_residuals(steepest_file)
