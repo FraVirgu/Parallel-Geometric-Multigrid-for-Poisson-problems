@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 #include "globals.hpp"
-
+#include <chrono>
 using namespace std;
 
 // Initialize vector to zero
@@ -166,8 +166,6 @@ void MG(double *output, double *initial_solution, double *smoother_output, doubl
     vector<double> residual(l);
     compute_residual(residual.data(), initial_solution, f, weight, height, h_actual);
 
-    cout << "Level: " << level << ", N: " << N << ", Initial residual: " << vector_norm(residual.data(), l) << endl;
-
     // Pre-smoothing
     Jacobi(initial_solution, smoother_output, f, smoother_residual, height, weight, l, h_actual, v1);
 
@@ -198,7 +196,6 @@ void MG(double *output, double *initial_solution, double *smoother_output, doubl
 
     // Post-smoothing
     Jacobi(smoother_output, output, f, smoother_residual, height, weight, l, h_actual, v2);
-    cout << "Output norm: " << vector_norm(output, l) << endl;
 }
 
 int main()
@@ -215,11 +212,23 @@ int main()
     vector<double> residual(L, 0.0);
 
     compute_rhs(rhs.data());
+    int iteration_jacobian = 2000;
+    cout << "Jacobi METHOD" << endl;
+    auto start_J = chrono::high_resolution_clock::now();
+    Jacobi(solution.data(), smoother_output.data(), rhs.data(), residual.data(), initial_H, initial_W, initial_L, initial_h, iteration_jacobian);
+    auto end_J = chrono::high_resolution_clock::now();
+    cout << "Jacobi time: " << chrono::duration_cast<chrono::milliseconds>(end_J - start_J).count() << "ms" << endl;
+    double *output_residual_J = new double[initial_L];
+    compute_residual(output_residual_J, solution.data(), rhs.data(), initial_W, initial_H, initial_h);
+    cout << "Residual norm: " << vector_norm(output_residual_J, initial_L) << endl;
+    cout << endl;
 
-    int v1 = 4, v2 = 4, level = 0;
-    // Jacobi(solution.data(), smoother_output.data(), rhs.data(), residual.data(), initial_H, initial_W, initial_L, initial_h, v1);
+    int v1 = 2, v2 = 2, level = 0;
+    cout << "MULTIGRID METHOD" << endl;
+    auto start_MG = chrono::high_resolution_clock::now();
     MG(solution.data(), initial_guess.data(), smoother_output.data(), rhs.data(), residual.data(), v1, v2, level);
-    cout << "Final computed solution (u):" << endl;
+    auto end_MG = chrono::high_resolution_clock::now();
+    cout << "Multigrid time: " << chrono::duration_cast<chrono::milliseconds>(end_MG - start_MG).count() << "ms" << endl;
     double *output_residual = new double[initial_L];
     compute_residual(output_residual, solution.data(), rhs.data(), initial_W, initial_H, initial_h);
     cout << "Residual norm: " << vector_norm(output_residual, initial_L) << endl;
