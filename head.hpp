@@ -66,6 +66,14 @@ void initialize_zeros_vector(double *x)
         x[i] = 0.0;
     }
 }
+
+void dynamic_initialize_zeros_vector(double *x, int l)
+{
+    for (int i = 0; i < l; i++)
+    {
+        x[i] = 0.0;
+    }
+}
 void compute_rhs(double *f)
 {
     double dx = a / W;

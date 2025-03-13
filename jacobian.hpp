@@ -105,7 +105,6 @@ bool Jacobian(double *x, double *x_new, double *f, double *r, double *residual_r
 // Perform Jacobi iterations
 bool Jacobian_2(double *x, double *x_new, double *f, int v, int height, int weight, double h_act, int l)
 {
-
     for (int i = 0; i < v; i++)
     {
         // Perform Jacobi iteration
