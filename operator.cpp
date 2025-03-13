@@ -134,14 +134,12 @@ void restriction(double *input, double *output, int input_H, int input_W, int ou
 }
 
 // Multigrid solver
-void MG(double *output, double *initial_solution, double *smoother_output, double *f, double *smoother_residual, int v1, int v2, int level, int alfa = 1)
+void MG(double *output, double *initial_solution, double *smoother_output, double *f, double *smoother_residual, int v1, int v2, int level, int alfa = 10)
 {
     int n = N, l = N * N, weight = W, height = H;
     int n_succ, l_succ, weight_succ, height_succ;
     double h_actual = h;
     double h_succ;
-
-    // cout << "Level: " << level << " N: " << N << endl;
 
     // Pre-smoothing
     Jacobian_2(initial_solution, smoother_output, f, v1, height, weight, h_actual, l);
@@ -173,9 +171,12 @@ void MG(double *output, double *initial_solution, double *smoother_output, doubl
     }
     else
     {
-        for (int i = 0; i < alfa; i++)
+        MG(delta_H, initial_solution_H, smoother_output_H, r_H, smoother_residual_H, v1, v2, level + 1, alfa);
+        reset_global_parameter(n);
+        for (int i = 0; i < alfa - 1; i++)
         {
-            MG(delta_H, initial_solution_H, smoother_output_H, r_H, smoother_residual_H, v1, v2, level + 1, alfa);
+            MG(delta_H, delta_H, smoother_output_H, r_H, smoother_residual_H, v1, v2, level + 1, alfa);
+            reset_global_parameter(n);
         }
     }
 
@@ -213,7 +214,7 @@ int main()
     cout << "Jacobi time: " << chrono::duration_cast<chrono::milliseconds>(end - start).count() << "ms" << endl;
     cout << "Residual norm: " << vector_norm(res) << endl;
 
-    int v1 = 10, v2 = 10, level = 0;
+    int v1 = 50, v2 = 50, level = 0;
     cout << "MULTIGRID METHOD" << endl;
     initialize_zeros_vector(x);
     initialize_zeros_vector(output);
