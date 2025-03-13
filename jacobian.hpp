@@ -101,3 +101,28 @@ bool Jacobian(double *x, double *x_new, double *f, double *r, double *residual_r
         return true;
     }
 }
+
+// Perform Jacobi iterations
+bool Jacobian_2(double *x, double *x_new, double *f, int v, int height, int weight, double h_act, int l)
+{
+
+    for (int i = 0; i < v; i++)
+    {
+        // Perform Jacobi iteration
+        for (int y = 1; y < height - 1; y++)
+        {
+            for (int x_pos = 1; x_pos < weight - 1; x_pos++)
+            {
+                int index = y * weight + x_pos;
+                x_new[index] = 0.25 * ((h_act * h_act * f[index]) + x[index - 1] + x[index + 1] + x[index - weight] + x[index + weight]);
+            }
+        }
+
+        // Copy x_new to x for next iteration
+        for (int j = 0; j < l; j++)
+        {
+            x[j] = x_new[j];
+        }
+    }
+    return false;
+}
